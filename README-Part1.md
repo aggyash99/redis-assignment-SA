@@ -7,7 +7,6 @@ This document covers the setup of Redis OSS on **Server A** and Redis Enterprise
 | | Server A | Server B |
 |-|----------|----------|
 | **Role** | Redis OSS (Source) | Redis Enterprise (Target) |
-| **IP** | TBD | TBD |
 
 ---
 
@@ -38,11 +37,10 @@ sudo apt-get update
 apt policy redis
 ```
 
-> ✅ APT repository setup completed. Ran `apt policy redis` to list available versions.
 
 ### Step 2 — Install Redis OSS 7.2.0
 
-> ⚠️ **Important:** The APT version string requires an **epoch prefix `6:`** — see Troubleshooting Issue 1 below for details.
+> **Important:** The APT version string requires an **epoch prefix `6:`** — see Troubleshooting Issue 1 below for details.
 
 ```bash
 # Correct install command (with epoch prefix)
@@ -57,13 +55,6 @@ redis-server --version
 ```
 
 ### Step 3 — Install Status
-
-| Step | Status |
-|------|--------|
-| Add Redis APT repo & GPG key | ✅ Done |
-| Run `apt policy redis` to check versions | ✅ Done |
-| Install Redis OSS 7.2.0 | ✅ Done |
-| Verify installation (`redis-server --version`) | ✅ Done |
 
 ### Key Configuration — `redis.conf`
 
@@ -80,8 +71,6 @@ sudo find / -name "redis.conf" 2>/dev/null
 sudo cp /etc/redis/redis.conf /etc/redis/redis.conf.bak
 ```
 
-> ✅ Config file located at `/etc/redis/redis.conf`. Backup created at `/etc/redis/redis.conf.bak`.
-
 #### Step 2 — Edit redis.conf
 
 ```bash
@@ -97,14 +86,7 @@ port 6380
 # Persistence — AOF with always fsync for best durability
 appendonly yes
 appendfsync always
-
-# (Optional) RDB snapshot as additional safety net
-save 900 1
-save 300 10
-save 60 10000
 ```
-
-> ✅ Port changed to **6380**. AOF persistence enabled with `appendfsync always`.
 
 #### Step 3 — Restart Redis and verify
 
@@ -114,13 +96,9 @@ sudo systemctl restart redis-server
 
 # Verify Redis is running on port 6380
 redis-cli -p 6380 PING
-# Output: PONG ✅
+# Output: PONG
 
-# Confirm port from config
-redis-cli -p 6380 CONFIG GET port
 ```
-
-> ✅ Redis restarted successfully. Confirmed running on port **6380** via `redis-cli PING`.
 
 ### Configuration Snapshots
 
@@ -128,7 +106,7 @@ redis-cli -p 6380 CONFIG GET port
 <!-- Example: ![redis.conf snapshot](images/redis-oss-conf.png) -->
 
 <!-- Add screenshot of redis-cli PING confirming port 6380 here -->
-<!-- Example: ![Redis PING on 6380](images/redis-ping-6380.png) -->
+![Redis PING on 6380](images/redis-ping-6380.png)
 
 ---
 
@@ -139,8 +117,6 @@ redis-cli -p 6380 CONFIG GET port
 ```bash
 sudo apt-get install -y memtier-benchmark
 ```
-
-> ✅ memtier-benchmark installed.
 
 ---
 
@@ -169,10 +145,10 @@ memtier_benchmark \
 | Gets | 10,017.65 | 6.56 | 10,011.09 | 9.80623 | 9.53500 | 17.66300 | 25.08700 | 390.82 |
 | **Totals** | **20,036.95** | **6.56** | **10,011.09** | **9.81179** | **9.53500** | **17.79100** | **24.95900** | **1,837.88** |
 
-> ✅ Baseline captured. Total throughput: **~20,037 ops/sec** | Avg latency: **9.81 ms** | P99: **17.79 ms**
+> Baseline captured. Total throughput: **~20,037 ops/sec** | Avg latency: **9.81 ms** | P99: **17.79 ms**
 
 <!-- Add baseline benchmark screenshot here -->
-<!-- Example: ![Baseline Benchmark](images/memtier-baseline.png) -->
+![Baseline Benchmark](images/memtier-baseline.png)
 
 ---
 
@@ -219,10 +195,10 @@ Waits           0.00          ---          ---             ---             ---  
 Totals      15596.59         0.00         0.00        12.84043         9.59900       100.86300       146.43100      2222.04 
 ```
 
-> ✅ 100,000 keys loaded successfully. Throughput: **15,596.59 ops/sec** | Avg latency: **12.84 ms** | P99: **100.86 ms**
+> 100,000 keys loaded successfully. Throughput: **15,596.59 ops/sec** | Avg latency: **12.84 ms** | P99: **100.86 ms**
 
 <!-- Add data load benchmark screenshot here -->
-<!-- Example: ![Data Load Results](images/memtier-load.png) -->
+![Data Load Results](images/memtier-load.png)
 
 ---
 
@@ -267,10 +243,10 @@ Totals      22156.27       129.99     10947.26         9.02230         8.76700  
 | P99 Latency (ms) | 17.79 | 17.54 | ▼ -0.25 ms (-1.4%) |
 | P99.9 Latency (ms) | 24.96 | 25.60 | ▲ +0.64 ms (+2.6%) |
 
-> ✅ Post-load benchmark complete. With 100K keys, throughput **increased ~10.6%** and average latency **improved by ~8%** compared to baseline — consistent with Redis warming up its internal structures. P99.9 latency remained stable at ~25 ms.
+> Post-load benchmark complete. With 100K keys, throughput **increased ~10.6%** and average latency **improved by ~8%** compared to baseline — consistent with Redis warming up its internal structures. P99.9 latency remained stable at ~25 ms.
 
 <!-- Add post-load benchmark screenshot here -->
-<!-- Example: ![Post-Load Benchmark](images/memtier-postload.png) -->
+![Post-Load Benchmark](images/memtier-postload.png)
 
 ---
 
@@ -293,7 +269,7 @@ put <redislabs-tar-file-name>
 exit
 ```
 
-> ✅ Latest Redis Enterprise tar file downloaded and uploaded to Server B via SFTP.
+> Latest Redis Enterprise tar file downloaded and uploaded to Server B via SFTP.
 
 ### Step 2 — Extract and Install
 
@@ -307,22 +283,13 @@ tar vxf <redislabs-tar-file-name>
 sudo ./install.sh -y
 ```
 
-> ✅ Redis Enterprise installed successfully via `install.sh -y`.
+> Redis Enterprise installed successfully via `install.sh -y`.
 
-### Step 3 — Install Status
+### Step 3 — Create Redis Enterprise Cluster & Database
 
-| Step | Status |
-|------|--------|
-| Download latest Redis Enterprise tar | ✅ Done |
-| Upload to Server B via SFTP | ✅ Done |
-| Extract tar file | ✅ Done |
-| Run `sudo ./install.sh -y` | ✅ Done |
+> **No-DNS setup:** Use IP address directly — do not configure DNS hostnames.
 
-### Step 4 — Create Redis Enterprise Cluster & Database
-
-> ⚠️ **No-DNS setup:** Use IP address directly — do not configure DNS hostnames.
-
-#### Step 4a — Access the Web UI and Create Cluster
+#### Step 3a — Access the Web UI and Create Cluster
 
 ```bash
 # Open browser on local machine:
@@ -335,9 +302,9 @@ On the landing page, two options are presented:
 
 ![RE Create Cluster Landing Page](images/re-create-cluster.png)
 
-> ✅ Clicked **Create Cluster** to initialize a new single-node Redis Enterprise cluster.
+> Clicked **Create Cluster** to initialize a new single-node Redis Enterprise cluster.
 
-#### Step 4b — Set Admin Credentials
+#### Step 3b — Set Admin Credentials
 
 The next screen prompts for cluster administrator credentials:
 
@@ -346,9 +313,9 @@ The next screen prompts for cluster administrator credentials:
 
 ![RE Set Admin Credentials](images/re-set-credentials.png)
 
-> ✅ Admin credentials set. These are used to log into the Redis Enterprise web UI going forward.
+> Admin credentials set. These are used to log into the Redis Enterprise web UI going forward.
 
-#### Step 4c — Configure the Cluster
+#### Step 3c — Configure the Cluster
 
 Reference: https://redis.io/docs/latest/operate/rs/installing-upgrading/quickstarts/redis-enterprise-software-quickstart/
 
@@ -361,17 +328,17 @@ The cluster configuration screen presents several options. Only the **FQDN** was
 
 ![RE Cluster Configuration](images/re-cluster-config.png)
 
-> ✅ Cluster FQDN set to `cluster.local`. Clicked **Next** to proceed.
+> Cluster FQDN set to `cluster.local`. Clicked **Next** to proceed.
 
-> ⚠️ **No-DNS note:** Using `cluster.local` as the FQDN works for a single-node no-DNS setup. No external DNS configuration is required.
+> **No-DNS note:** Using `cluster.local` as the FQDN works for a single-node no-DNS setup. No external DNS configuration is required.
 
-#### Step 4d — Default Configuration & Cluster Activation
+#### Step 3d — Default Configuration & Cluster Activation
 
 A default configuration page was shown — all settings left as defaults. Clicked **Next** to proceed.
 
 > The system then logged out automatically and redirected to the Redis Enterprise login screen.
 
-#### Step 4e — Log In to Redis Enterprise Dashboard
+#### Step 3e — Log In to Redis Enterprise Dashboard
 
 Used the admin credentials created in Step 4b to log in:
 
@@ -383,9 +350,9 @@ Password: <your-password>
 
 ![RE Cluster Dashboard](images/re-cluster-dashboard.png)
 
-> ✅ Successfully logged into the Redis Enterprise cluster dashboard. Cluster is up and running.
+> Successfully logged into the Redis Enterprise cluster dashboard. Cluster is up and running.
 
-#### Step 4f — Create Database
+#### Step 3f — Create Database
 
 Reference: https://redis.io/docs/latest/operate/rs/databases/import-export/replica-of/create/#source-available-cluster
 
@@ -395,22 +362,15 @@ From the cluster dashboard, clicked **Create Database** and configured:
 |-----------|-------|
 | Region Type | Single Region |
 | Database Name | `migration-target` |
-| Memory Limit | 1 GB |
+| Memory Limit | 200 MB |
 | Port | 12000 |
 | Replica Of (Source) | `redis://<SERVER_A_IP>:6380` |
 
-> ✅ Database `migration-target` created on port **12000** with **1 GB** memory limit and **Replica Of** configured to sync from Redis OSS on Server A (`redis://<SERVER_A_IP>:6380`).
-
-![RE DB Config](images/re-db-config.png)
+> Database `migration-target` created on port **12000** with **200 MB** memory limit and **Replica Of** configured to sync from Redis OSS on Server A (`redis://<SERVER_A_IP>:6380`).
 
 ---
 
 ## 4. Replication Configuration — Replica Of
-
-### Setup
-- **Source:** Redis OSS on Server A — `redis://<SERVER_A_IP>:6380`
-- **Target:** Redis Enterprise DB `migration-target` on Server B — port `12000`
-- **Direction:** OSS → Enterprise (Replica Of)
 
 ### Configuration Applied
 
@@ -423,11 +383,11 @@ redis://<SERVER_A_IP>:6380
 
 Reference: https://redis.io/docs/latest/operate/rs/databases/import-export/replica-of/create/#source-available-cluster
 
-> ✅ Replica Of configured. Redis Enterprise database `migration-target` (port 12000) is now replicating from Redis OSS on Server A (port 6380).
+> Replica Of configured. Redis Enterprise database `migration-target` (port 12000) is now replicating from Redis OSS on Server A (port 6380).
 
 ### Replication Status
 
-> ✅ **Replica Of status: Synced** — Redis Enterprise web UI shows a green checkmark confirming the database is fully in sync with the source.
+> **Replica Of status: Synced** — Redis Enterprise web UI shows a green checkmark confirming the database is fully in sync with the source.
 
 ![Replication Status](images/re-replication-status.png)
 
@@ -444,28 +404,31 @@ redis-cli -h <SERVER_B_IP> -p 12000 DBSIZE
 ```bash
 # On Server A
 redis-cli -p 6380 DBSIZE
-# Output: 103316 ✅
+# Output: 103316 
 
 # On Server B
 redis-cli -p 12000 DBSIZE
-# Output: 103316 ✅
+# Output: 103316 
 ```
 
 | Server | Key Count |
 |--------|-----------|
 | Server A — Redis OSS (port 6380) | **103,316** |
 | Server B — Redis Enterprise `migration-target` (port 12000) | **103,316** |
-| Match? | ✅ Yes — keys match exactly |
+| Match? | Yes — keys match exactly |
 
 <!-- Add DBSIZE screenshots here -->
-<!-- Example: ![DBSIZE Server A](images/dbsize-server-a.png) -->
-<!-- Example: ![DBSIZE Server B](images/dbsize-server-b.png) -->
-
-> ✅ **Replication verified.** Both Redis OSS (Server A) and Redis Enterprise `migration-target` (Server B) have identical key counts of **103,316** — confirming successful Replica Of synchronization.
-
+![DBSIZE Server A & B](images/dbsize-server.png)
 ---
 
-## 5. Troubleshooting Notes *(Optional)*
+## 5. Troubleshooting Notes
+
+| Issue | Root Cause | Resolution |
+|-------|-----------|------------|
+| `Version '7.2.0-1rl1~focal1' not found` via APT | Epoch prefix `6:` missing from version string | Use full version `6:7.2.0-1rl1~focal1` with epoch prefix |
+| `Port 53 in use` / `Another DNS server already installed` during RE install | `systemd-resolved` occupying port 53 | Set `DNSStubListener=no`, recreate resolv.conf symlink, restart DNS — See Issue 2 |
+| `./install.sh: line 466: python: command not found` during RE install | Ubuntu 20.04+ ships `python3` only; `python` symlink missing | Install `python-is-python3` — See Issue 3 |
+| `Unable to connect to redis://<SERVER_A_IP>:6380` during Replica Of setup | UFW firewall on Server A blocking inbound TCP port 6380 | `sudo ufw allow 6380/tcp` on Server A — See Issue 4 |
 
 ### Issue 1 — Redis 7.2.0 version not found via APT
 
@@ -487,37 +450,6 @@ The Redis APT repository at `packages.redis.io` only retains recent versions. Re
 
 **Resolution Steps:**
 
-**Option 1 — Check exact available versions from the repo:**
-```bash
-# List all available redis-server versions
-apt-cache madison redis-server
-
-# Or use policy
-apt-cache policy redis-server
-```
-Use the exact version string shown in the output (e.g., `7.2.x-1rl1~focal1`).
-
-**Option 2 — Build Redis 7.2.0 from source (recommended if APT doesn't have it):**
-```bash
-# Install build dependencies
-sudo apt-get install -y build-essential tcl
-
-# Download Redis 7.2.0 source
-wget https://download.redis.io/releases/redis-7.2.0.tar.gz
-tar xzf redis-7.2.0.tar.gz
-cd redis-7.2.0
-
-# Build and install
-make
-make test       # optional but recommended
-sudo make install
-
-# Verify
-redis-server --version
-```
-
-**Option 3 — Include the epoch prefix in the version string (✅ Correct Fix):**
-
 Running `apt-cache madison redis-server` revealed the version string includes an **epoch prefix `6:`**:
 ```
 redis-server | 6:7.2.0-1rl1~focal1 | https://packages.redis.io/deb focal/main amd64 Packages
@@ -535,16 +467,9 @@ sudo apt-get install -y \
 redis-server --version
 ```
 
-**Status:** ✅ Resolved — epoch prefix `6:` was missing from the version string
+**Status:** Resolved — epoch prefix `6:` was missing from the version string
 
 ---
-
-| Issue | Root Cause | Resolution | Status |
-|-------|-----------|------------|--------|
-| `Version '7.2.0-1rl1~focal1' not found` via APT | Epoch prefix `6:` missing from version string | Use full version `6:7.2.0-1rl1~focal1` with epoch prefix | ✅ Resolved |
-| `Port 53 in use` / `Another DNS server already installed` during RE install | `systemd-resolved` occupying port 53 | Set `DNSStubListener=no`, recreate resolv.conf symlink, restart DNS — See Issue 2 | ✅ Resolved |
-| `./install.sh: line 466: python: command not found` during RE install | Ubuntu 20.04+ ships `python3` only; `python` symlink missing | Install `python-is-python3` — See Issue 3 | ✅ Resolved |
-| `Unable to connect to redis://<SERVER_A_IP>:6380` during Replica Of setup | UFW firewall on Server A blocking inbound TCP port 6380 | `sudo ufw allow 6380/tcp` on Server A — See Issue 4 | ✅ Resolved |
 
 <!-- Add failure/resolution snapshots here if applicable -->
 <!-- Example: ![Issue snapshot](images/issue-1.png) -->
@@ -568,7 +493,7 @@ this port available and run the installation again.
 
 **Screenshot:**
 <!-- Add screenshot of the error here -->
-<!-- Example: ![RE Install Port 53 Error](images/re-install-port53-error.png) -->
+![RE Install Port 53 Error](images/re-install-port53-error.png)
 
 **Root Cause:**
 Redis Enterprise installs its own internal DNS server (`bind`) on port 53. On Ubuntu 18.04+, `systemd-resolved` is running by default and occupies port 53, blocking the Redis Enterprise installer.
@@ -598,7 +523,7 @@ sudo service systemd-resolved restart
 sudo ./install.sh -y
 ```
 
-**Status:** ✅ Resolved — set `DNSStubListener=no` in `systemd-resolved`, recreated `/etc/resolv.conf` symlink, restarted DNS service, then re-ran `install.sh -y` successfully.
+**Status:** Resolved — set `DNSStubListener=no` in `systemd-resolved`, recreated `/etc/resolv.conf` symlink, restarted DNS service, then re-ran `install.sh -y` successfully.
 
 <!-- Add screenshot of resolved state / successful install here -->
 <!-- Example: ![RE Install Success](images/re-install-success.png) -->
@@ -619,7 +544,7 @@ sudo ./install.sh -y
 
 **Screenshot:**
 <!-- Add screenshot of the error here -->
-<!-- Example: ![RE Install Python Error](images/re-install-python-error.png) -->
+![RE Install Python Error](images/re-install-python-error.png)
 
 **Root Cause:**
 Ubuntu 20.04+ (Focal) ships with `python3` only. The `python` binary (Python 2 / unversioned) is not available by default, and the Redis Enterprise `install.sh` script calls `python` directly at line 466.
@@ -660,7 +585,7 @@ sudo apt install python-is-python3 -y
 
 # Verify python symlink
 python --version
-# Output: Python 3.x.x ✅
+# Output: Python 3.x.x
 
 # Re-run Redis Enterprise installer
 sudo ./install.sh -y
@@ -669,7 +594,7 @@ sudo ./install.sh -y
 > **Root Cause Summary (APT Lock & Half-Installed Package):**
 > Interrupting the installer due to the Port 53 and Python errors left the `redislabs` package in a **`reinstreq` (reinstall required) state**, which locked the APT package manager and prevented any further `apt install` operations. Using `sudo dpkg --remove --force-all redislabs` cleared the broken package metadata, allowing system dependencies (`python-is-python3`) to be installed and the Redis Enterprise installation to be restarted from a clean state.
 
-**Status:** ✅ Resolved — force-removed broken `redislabs` package, cleaned APT cache, installed `python-is-python3`, then re-ran `install.sh -y` successfully.
+**Status:** Resolved — force-removed broken `redislabs` package, cleaned APT cache, installed `python-is-python3`, then re-ran `install.sh -y` successfully.
 
 <!-- Add screenshot of resolved install here -->
 <!-- Example: ![RE Install Success After Python Fix](images/re-install-success.png) -->
@@ -697,10 +622,7 @@ UFW (Uncomplicated Firewall) was active on **Server A** and had no rule permitti
 **Step 1 — Open port 6380 in UFW:**
 ```bash
 sudo ufw allow 6380/tcp
-# Output: Rules updated ✅
-
-# Verify the rule was added
-sudo ufw status
+# Output: Rules updated
 ```
 
 **Step 2 — Update `redis.conf` to bind on all interfaces:**
@@ -732,10 +654,10 @@ sudo systemctl restart redis-server
 **Step 3 — Verify connectivity from Server B:**
 ```bash
 nc -zv <SERVER_A_IP> 6380
-# Output: Connection to <SERVER_A_IP> 6380 port [tcp/*] succeeded! ✅
+# Output: Connection to <SERVER_A_IP> 6380 port [tcp/*] succeeded!
 ```
 
-> ✅ Resolved — UFW rule opened port 6380, `bind 0.0.0.0` allowed external connections, and `protected-mode no` permitted unauthenticated access. Replica Of connection from Redis Enterprise (Server B) to Redis OSS (Server A) succeeded.
+> Resolved — UFW rule opened port 6380, `bind 0.0.0.0` allowed external connections, and `protected-mode no` permitted unauthenticated access. Replica Of connection from Redis Enterprise (Server B) to Redis OSS (Server A) succeeded.
 
 ---
 

@@ -4,8 +4,8 @@
 
 A real-time leaderboard system for a gaming company supporting **~1,000 concurrent users** with constantly updating scores, maintaining the **Top 10 players** at all times.
 
-- **Language:** Python 3
-- **Redis Target:** Redis Enterprise DB `migration-target` (Server B, port 12000)
+- **Language:** Python
+- **Redis Target:** Redis Enterprise DB `LBD` (Server B, port 13000)
 - **Demo Type:** Terminal-based CLI dashboard + utility commands
 
 ---
@@ -16,18 +16,18 @@ A real-time leaderboard system for a gaming company supporting **~1,000 concurre
 ┌──────────────────────────────────────────────────────────────────┐
 │                      Leaderboard System                          │
 │                                                                  │
-│  ┌─────────────┐    ZINCRBY (score update)   ┌────────────────┐ │
-│  │  Simulated  │ ──────────────────────────► │  Redis Sorted  │ │
-│  │  ~1000      │                             │  Set           │ │
-│  │  Players    │ ◄─────────────────────────  │  (global_      │ │
-│  └─────────────┘    ZREVRANGE (top 10)        │  leaderboard)  │ │
-│                     ZREVRANK + ZSCORE          └────────────────┘ │
-│                     (player rank/score)                           │
+│  ┌─────────────┐    ZINCRBY (score update)   ┌────────────────┐  │
+│  │  Simulated  │ ──────────────────────────► │  Redis Sorted  │  │
+│  │  ~1000      │                             │  Set           │  │ 
+│  │  Players    │ ◄─────────────────────────  │  (global_      │  │
+│  └─────────────┘    ZREVRANGE (top 10)       │  leaderboard)  │  │
+│                     ZREVRANK + ZSCORE        └────────────────┘  │
+│                     (player rank/score)                          │
 │                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │               CLI Dashboard (terminal)                   │   │
-│  │   Real-time Top 10 │ VIP tracker │ Avg Read Latency      │   │
-│  └──────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │               CLI Dashboard (terminal)                   │    │
+│  │   Real-time Top 10 │ VIP tracker │ Avg Read Latency      │    │
+│  └──────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -42,7 +42,7 @@ A real-time leaderboard system for a gaming company supporting **~1,000 concurre
 | Leaderboard Size (Top-N) | Top 10 (configurable via `--n`) |
 | Refresh Interval | Configurable — default 0.5s |
 | Latency Target | < 5ms per operation |
-| Redis Target | Redis Enterprise DB (port 12000) |
+| Redis Target | Redis Enterprise DB (port 13000) |
 | Leaderboard Key | `global_leaderboard` (configurable via `--key`) |
 
 ---
@@ -64,28 +64,8 @@ A real-time leaderboard system for a gaming company supporting **~1,000 concurre
 |-----------|---------|------------|
 | Update / increment player score | `ZINCRBY global_leaderboard <increment> <player_id>` | O(log N) |
 | Get Top-N players (highest first) | `ZREVRANGE global_leaderboard 0 N-1 WITHSCORES` | O(log N + M) |
-| Get player rank (1-indexed) | `ZREVRANK global_leaderboard <player_id>` | O(log N) |
+| Get player rank | `ZREVRANK global_leaderboard <player_id>` | O(log N) |
 | Get player score | `ZSCORE global_leaderboard <player_id>` | O(1) |
-| Get total players | `ZCARD global_leaderboard` | O(1) |
-
-### Example Commands
-
-```bash
-# Increment player p:500 score by 75
-ZINCRBY global_leaderboard 75 p:500
-
-# Get Top 10 players (highest scores first)
-ZREVRANGE global_leaderboard 0 9 WITHSCORES
-
-# Get player rank (0-indexed from Redis, displayed as 1-indexed in app)
-ZREVRANK global_leaderboard p:500
-
-# Get player score
-ZSCORE global_leaderboard p:500
-
-# Total players on leaderboard
-ZCARD global_leaderboard
-```
 
 ### Why Redis Sorted Sets?
 
@@ -106,21 +86,6 @@ ZCARD global_leaderboard
 | Redis Hash + Sort | Flexible schema | Requires manual sort — not atomic |
 | Redis List | Simple | No built-in scoring or ranking |
 | Redis Sorted Set ✅ | Atomic, O(log N), built-in rank | Best fit for this use case |
-
----
-
-## Project Structure
-
-```
-redis-assignment-SA/
-├── README-Part1.md
-├── README-Part2.md
-├── PROJECT_CONTEXT.md
-├── leaderboard_redis.py      ← Part 2 implementation
-├── requirements.txt          ← Python dependencies (redis>=5.0.0)
-└── images/
-    └── ...
-```
 
 ---
 
@@ -166,7 +131,7 @@ redis>=5.0.0
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--host` | `YOUR_SERVER_B_IP` | Redis host |
-| `--port` | `12000` | Redis port |
+| `--port` | `13000` | Redis port |
 | `--db` | `0` | Redis database index |
 | `--key` | `global_leaderboard` | Leaderboard sorted set key name |
 
@@ -179,7 +144,7 @@ Simulates ~1,000 concurrent players updating scores and displays a live-refreshi
 ```bash
 python leaderboard_redis.py \
   --host <SERVER_B_IP> \
-  --port 12000 \
+  --port 13000 \
   dashboard \
   --updates 50 \
   --interval 0.5 \
@@ -228,7 +193,7 @@ Press `Ctrl+C` to exit.
 ```bash
 python leaderboard_redis.py \
   --host <SERVER_B_IP> \
-  --port 12000 \
+  --port 13000 \
   update p:500 150
 ```
 
@@ -244,7 +209,7 @@ Update: p:500 | New Score: 97353 | Key: global_leaderboard | Latency: 0.812ms
 ```bash
 python leaderboard_redis.py \
   --host <SERVER_B_IP> \
-  --port 12000 \
+  --port 13000 \
   get p:500
 ```
 
@@ -262,7 +227,7 @@ Stats: p:500 | Rank: #3 | Score: 97353 | Key: global_leaderboard | Latency: 0.65
 ```bash
 python leaderboard_redis.py \
   --host <SERVER_B_IP> \
-  --port 12000 \
+  --port 13000 \
   top --n 10
 ```
 
@@ -289,7 +254,7 @@ pip install redis
 ### Step 2 — Seed the leaderboard (run dashboard for a few seconds)
 
 ```bash
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 dashboard --updates 100 --interval 1 --vip p:1
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 dashboard --updates 100 --interval 1 --vip p:1
 # Let it run for 5–10 seconds, then Ctrl+C
 ```
 
@@ -297,21 +262,21 @@ python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 dashboard --update
 
 ```bash
 # Check total player count
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 top --n 10
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 top --n 10
 
 # Check a specific player
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 get p:500
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 get p:500
 
 # Update a player's score manually and verify rank changes
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 update p:500 999999
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 get p:500
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 update p:500 999999
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 get p:500
 # Expected: Rank #1
 ```
 
 ### Step 4 — Run the live dashboard
 
 ```bash
-python leaderboard_redis.py --host <SERVER_B_IP> --port 12000 dashboard --updates 50 --interval 0.5 --vip p:500
+python leaderboard_redis.py --host <SERVER_B_IP> --port 13000 dashboard --updates 50 --interval 0.5 --vip p:500
 ```
 
 Observe:
@@ -336,15 +301,15 @@ Observe:
 
 ```bash
 # Real-time Redis stats on Server B
-redis-cli -h <SERVER_B_IP> -p 12000 INFO stats
-redis-cli -h <SERVER_B_IP> -p 12000 INFO memory
-redis-cli -h <SERVER_B_IP> -p 12000 INFO clients
+redis-cli -h <SERVER_B_IP> -p 13000 INFO stats
+redis-cli -h <SERVER_B_IP> -p 13000 INFO memory
+redis-cli -h <SERVER_B_IP> -p 13000 INFO clients
 
 # Monitor live commands
-redis-cli -h <SERVER_B_IP> -p 12000 MONITOR
+redis-cli -h <SERVER_B_IP> -p 13000 MONITOR
 
 # Latency check
-redis-cli -h <SERVER_B_IP> -p 12000 --latency
+redis-cli -h <SERVER_B_IP> -p 13000 --latency
 ```
 
 ---
@@ -355,18 +320,18 @@ redis-cli -h <SERVER_B_IP> -p 12000 --latency
 
 ```bash
 # 1. Total players on leaderboard
-redis-cli -h <SERVER_B_IP> -p 12000 ZCARD global_leaderboard
+redis-cli -h <SERVER_B_IP> -p 13000 ZCARD global_leaderboard
 
 # 2. Top 10 sorted correctly (highest score first)
-redis-cli -h <SERVER_B_IP> -p 12000 ZREVRANGE global_leaderboard 0 9 WITHSCORES
+redis-cli -h <SERVER_B_IP> -p 13000 ZREVRANGE global_leaderboard 0 9 WITHSCORES
 
 # 3. Player rank matches score position
-redis-cli -h <SERVER_B_IP> -p 12000 ZREVRANK global_leaderboard p:500
-redis-cli -h <SERVER_B_IP> -p 12000 ZSCORE global_leaderboard p:500
+redis-cli -h <SERVER_B_IP> -p 13000 ZREVRANK global_leaderboard p:500
+redis-cli -h <SERVER_B_IP> -p 13000 ZSCORE global_leaderboard p:500
 
 # 4. Score increment reflects immediately in rank
-redis-cli -h <SERVER_B_IP> -p 12000 ZINCRBY global_leaderboard 9999999 p:500
-redis-cli -h <SERVER_B_IP> -p 12000 ZREVRANK global_leaderboard p:500
+redis-cli -h <SERVER_B_IP> -p 13000 ZINCRBY global_leaderboard 9999999 p:500
+redis-cli -h <SERVER_B_IP> -p 13000 ZREVRANK global_leaderboard p:500
 # Expected: 0 (rank #1)
 ```
 
@@ -376,7 +341,7 @@ redis-cli -h <SERVER_B_IP> -p 12000 ZREVRANK global_leaderboard p:500
 # Benchmark ZADD and ZRANGE against Redis Enterprise
 redis-benchmark \
   -h <SERVER_B_IP> \
-  -p 12000 \
+  -p 13000 \
   -c 50 \
   -n 100000 \
   -t zadd,zrange
