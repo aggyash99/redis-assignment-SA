@@ -87,7 +87,7 @@ A real-time leaderboard system for a gaming company supporting **~1,000 concurre
 | Redis List | Simple | No built-in scoring or ranking |
 | Redis Sorted Set ✅ | Atomic, O(log N), built-in rank | Best fit for this use case |
 
----
+--- 
 
 ## Prerequisites
 

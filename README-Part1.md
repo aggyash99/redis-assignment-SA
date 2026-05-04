@@ -523,10 +523,8 @@ sudo service systemd-resolved restart
 sudo ./install.sh -y
 ```
 
-**Status:** Resolved — set `DNSStubListener=no` in `systemd-resolved`, recreated `/etc/resolv.conf` symlink, restarted DNS service, then re-ran `install.sh -y` successfully.
+**Status:** Resolved — set `DNSStubListener=no` in `systemd-resolved`, recreated `/etc/resolv.conf` symlink, restarted DNS service.
 
-<!-- Add screenshot of resolved state / successful install here -->
-<!-- Example: ![RE Install Success](images/re-install-success.png) -->
 
 ---
 
@@ -597,7 +595,7 @@ sudo ./install.sh -y
 **Status:** Resolved — force-removed broken `redislabs` package, cleaned APT cache, installed `python-is-python3`, then re-ran `install.sh -y` successfully.
 
 <!-- Add screenshot of resolved install here -->
-<!-- Example: ![RE Install Success After Python Fix](images/re-install-success.png) -->
+![RE Install Success After Python Fix](images/re-install-success.png)
 
 ---
 
