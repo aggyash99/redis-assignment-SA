@@ -71,7 +71,7 @@ def run_dashboard(client, key, updates, interval, vip_id):
             v_score = res[1] if res[1] is not None else 0
 
             # UI Render
-            # sys.stdout.write("\033[H\033[J") 
+            sys.stdout.write("\033[H\033[J") 
             print(f"=== LEADERBOARD: {key} (DB: {client.connection_pool.connection_kwargs['db']}) ===")
             for i, (p, s) in enumerate(top_10, 1):
                 marker = " <--" if p == vip_id else ""
